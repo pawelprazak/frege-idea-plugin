@@ -1,79 +1,115 @@
 package org.fregelang.plugin.idea;
 
+import com.google.common.collect.ImmutableMap;
+import com.intellij.lang.annotation.HighlightSeverity;
 import com.intellij.lexer.FlexAdapter;
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
-import com.intellij.openapi.editor.SyntaxHighlighterColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
-import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
-import com.intellij.psi.TokenType;
+import com.intellij.openapi.util.Pair;
 import com.intellij.psi.tree.IElementType;
-import org.fregelang.plugin.idea.psi.FregeTypes;
-import static org.fregelang.plugin.idea.psi.FregeTypes.*;
+import org.fregelang.plugin.idea.parser.token.FregeLexerTokens;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
-import java.io.Reader;
+import java.util.function.Function;
 
 import static com.intellij.openapi.editor.colors.TextAttributesKey.createTextAttributesKey;
+import static java.util.stream.Collectors.toMap;
+import static org.fregelang.plugin.idea.psi.FregeTypes.BLOCK_COMMENT;
+import static org.fregelang.plugin.idea.psi.FregeTypes.END_OF_LINE_COMMENT;
 
 public class FregeSyntaxHighlighter extends SyntaxHighlighterBase {
-    public static final TextAttributesKey END_OF_LINE_COMMENT = createTextAttributesKey("FREGE_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT);
-    public static final TextAttributesKey BLOCK_COMMENT       = createTextAttributesKey("FREGE_BLOCK_COMMENT", DefaultLanguageHighlighterColors.BLOCK_COMMENT);
-    public static final TextAttributesKey KEYWORD             = createTextAttributesKey("FREGE_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD);
-    public static final TextAttributesKey STRING              = createTextAttributesKey("FREGE_STRING", DefaultLanguageHighlighterColors.STRING);
-    public static final TextAttributesKey NUMBER              = createTextAttributesKey("FREGE_NUMBER", DefaultLanguageHighlighterColors.NUMBER);
 
-    public static final IElementType[] KEYWORDS = {
-        AS_KW, CASE_KW, CLASS_KW, DATA_KW, DEFAULT_KW, DO_KW, ELSE_KW, EXPORT, HIDING_KW, IF_KW, IMPORT_KW, IN_KW, INFIX_KW, INFIXL_KW,
-        INFIXR_KW, INSTANCE_KW, FORALL_KW, FOREIGN_KW, LET_KW, MODULE_KW, OF_KW, THEN_KW, QUALIFIED_KW, TYPE_KW, WHERE_KW};
+    public static final TextAttributesKey FREGE_BRACKETS
+            = createTextAttributesKey("FREGE_BRACKETS", DefaultLanguageHighlighterColors.BRACES);
+    public static final TextAttributesKey FREGE_CLASS
+            = createTextAttributesKey("FREGE_CLASS");
+    public static final TextAttributesKey FREGE_CONSTRUCTOR
+            = createTextAttributesKey("FREGE_CONSTRUCTOR");
+    public static final TextAttributesKey FREGE_CURLY
+            = createTextAttributesKey("FREGE_CURLY", DefaultLanguageHighlighterColors.BRACES);
+    public static final TextAttributesKey FREGE_DOUBLE_COLON
+            = createTextAttributesKey("FREGE_DOUBLE_COLON");
+    public static final TextAttributesKey FREGE_EQUAL
+            = createTextAttributesKey("FREGE_EQUAL", DefaultLanguageHighlighterColors.IDENTIFIER);
+    public static final TextAttributesKey FREGE_KEYWORD
+            = createTextAttributesKey("FREGE_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD);
+    public static final TextAttributesKey FREGE_PARENTHESIS
+            = createTextAttributesKey("FREGE_PARENTHESIS", DefaultLanguageHighlighterColors.PARENTHESES);
+    public static final TextAttributesKey FREGE_STRING_LITERAL
+            = createTextAttributesKey("FREGE_STRING_LITERAL", DefaultLanguageHighlighterColors.STRING);
+    public static final TextAttributesKey FREGE_SIGNATURE
+            = createTextAttributesKey("FREGE_SIGNATURE");
+    public static final TextAttributesKey FREGE_COMMENT
+            = createTextAttributesKey("FREGE_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT);
+    public static final TextAttributesKey FREGE_PRAGMA
+            = createTextAttributesKey("FREGE_PAGMA", DefaultLanguageHighlighterColors.LINE_COMMENT);
+    public static final TextAttributesKey FREGE_NUMBER
+            = createTextAttributesKey("FREGE_NUMBER", DefaultLanguageHighlighterColors.NUMBER);
+    public static final TextAttributesKey FREGE_TYPE
+            = createTextAttributesKey("FREGE_TYPE");
+    public static final TextAttributesKey FREGE_OPERATOR
+            = createTextAttributesKey("FREGE_OPERATOR", DefaultLanguageHighlighterColors.IDENTIFIER);
+    public static final TextAttributesKey FREGE_IDENTIFIER
+            = createTextAttributesKey("FREGE_IDENTIFIER", DefaultLanguageHighlighterColors.IDENTIFIER);
 
-    static final TextAttributesKey BAD_CHARACTER = createTextAttributesKey("FREGE_BAD_CHARACTER",
-        new TextAttributes(Color.RED, null, null, null, Font.BOLD));
+    private static final ImmutableMap<IElementType, TextAttributesKey> KEYS
+            = ImmutableMap.<IElementType, TextAttributesKey>builder()
+            .put(END_OF_LINE_COMMENT, FREGE_COMMENT)
+            .put(BLOCK_COMMENT, FREGE_COMMENT)
 
-    private static final TextAttributesKey[] BAD_CHAR_KEYS      = new TextAttributesKey[]{BAD_CHARACTER};
-    private static final TextAttributesKey[] COMMENT_KEYS       = new TextAttributesKey[]{END_OF_LINE_COMMENT};
-    private static final TextAttributesKey[] BLOCK_COMMENT_KEYS = new TextAttributesKey[]{BLOCK_COMMENT};
-    private static final TextAttributesKey[] KEYWORD_KEYS       = new TextAttributesKey[]{KEYWORD};
-    private static final TextAttributesKey[] STRING_KEYS        = new TextAttributesKey[]{STRING};
-    private static final TextAttributesKey[] NUMBER_KEYS        = new TextAttributesKey[]{NUMBER};
-    private static final TextAttributesKey[] EMPTY_KEYS         = new TextAttributesKey[0];
+            .putAll(FregeLexerTokens.KEYWORDS.stream().collect(toMap(Function.identity(), t -> FREGE_KEYWORD)))
 
-    protected boolean isKeyword(IElementType candidate) {
-        for (int i = 0; i < KEYWORDS.length; i++) {
-            if (candidate == KEYWORDS[i]) return true;
-        }
-        return false;
-    }
+            .put(FregeLexerTokens.PRAGMA, FREGE_PRAGMA)
+
+            .put(FregeLexerTokens.LEFT_PAREN, FREGE_PARENTHESIS)
+            .put(FregeLexerTokens.RIGHT_PAREN, FREGE_PARENTHESIS)
+            .put(FregeLexerTokens.LEFT_BRACE, FREGE_CURLY)
+            .put(FregeLexerTokens.RIGHT_BRACE, FREGE_CURLY)
+
+            .put(FregeLexerTokens.LEFT_BRACKET, FREGE_BRACKETS)
+            .put(FregeLexerTokens.RIGHT_BRACKET, FREGE_BRACKETS)
+
+            .put(FregeLexerTokens.DOUBLE_COLON, FREGE_DOUBLE_COLON)
+            .put(FregeLexerTokens.EQUALS, FREGE_EQUAL)
+
+            .put(FregeLexerTokens.AT, FREGE_IDENTIFIER)
+            .put(FregeLexerTokens.UNDERSCORE, FREGE_IDENTIFIER)
+            .put(FregeLexerTokens.VARID, FREGE_IDENTIFIER)
+            .put(FregeLexerTokens.QVARID, FREGE_IDENTIFIER)
+
+            .put(FregeLexerTokens.CONID, FREGE_CONSTRUCTOR)
+            .put(FregeLexerTokens.QCONID, FREGE_CONSTRUCTOR)
+            .put(FregeLexerTokens.OPERATOR_CONS, FREGE_CONSTRUCTOR)
+            .put(FregeLexerTokens.COLON, FREGE_CONSTRUCTOR)
+
+            .put(FregeLexerTokens.OPERATOR_ID, FREGE_OPERATOR)
+            .put(FregeLexerTokens.MINUS, FREGE_OPERATOR)
+
+            .put(FregeLexerTokens.STRING, FREGE_STRING_LITERAL)
+            .put(FregeLexerTokens.CHAR, FREGE_STRING_LITERAL)
+
+            .put(FregeLexerTokens.INTEGER, FREGE_NUMBER)
+
+            .put(FregeLexerTokens.DOUBLE_ARROW, FREGE_CLASS)
+            .build();
+
+    public static final ImmutableMap<TextAttributesKey, Pair<String, HighlightSeverity>> DISPLAY_NAMES =
+            ImmutableMap.<TextAttributesKey, Pair<String, HighlightSeverity>>builder()
+                    .put(FREGE_KEYWORD, new Pair<>("Property value", null))
+                    .put(FREGE_COMMENT, new Pair<>("Comment", null))
+                    .build();
 
     @NotNull
     @Override
     public Lexer getHighlightingLexer() {
-        return new FlexAdapter(new FregeLexer((Reader) null));
+        return new FlexAdapter(new FregeLexer(null));
     }
 
     @NotNull
     @Override
     public TextAttributesKey[] getTokenHighlights(IElementType tokenType) {
-        if (tokenType.equals(FregeTypes.BLOCK_COMMENT)) {
-            return BLOCK_COMMENT_KEYS;
-        } else if (tokenType.equals(FregeTypes.PRAGMA)) {
-            return BLOCK_COMMENT_KEYS;
-        } else if (tokenType.equals(FregeTypes.END_OF_LINE_COMMENT)) {
-            return COMMENT_KEYS;
-        } else if (tokenType.equals(FregeTypes.STRING)) {
-            return STRING_KEYS;
-        } else if (tokenType.equals(FregeTypes.CHARACTER)) {
-            return STRING_KEYS;
-        } else if (tokenType.equals(FregeTypes.NUMBER)) {
-            return NUMBER_KEYS;
-        } else if (tokenType.equals(TokenType.BAD_CHARACTER)) {
-            return BAD_CHAR_KEYS;
-        } else if (isKeyword(tokenType)) {
-            return KEYWORD_KEYS;
-        } else {
-            return EMPTY_KEYS;
-        }
+        return SyntaxHighlighterBase.pack(KEYS.get(tokenType));
     }
 }
