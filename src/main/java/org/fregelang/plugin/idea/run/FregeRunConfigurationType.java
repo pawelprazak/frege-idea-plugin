@@ -15,57 +15,59 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 
 public class FregeRunConfigurationType implements ConfigurationType {
-  private final ConfigurationFactory myConfigurationFactory;
 
-  public FregeRunConfigurationType() {
-    myConfigurationFactory = new FregeFactory(this);
-  }
+    private final ConfigurationFactory myConfigurationFactory;
 
-  public static FregeRunConfigurationType getInstance() {
-    return ConfigurationTypeUtil.findConfigurationType(FregeRunConfigurationType.class);
-  }
+    public FregeRunConfigurationType() {
+        myConfigurationFactory = new FregeFactory(this);
+    }
 
-  @Override
-  public String getDisplayName() {
-    return "Frege";
-  }
-
-  @Override
-  public String getConfigurationTypeDescription() {
-    return "Frege runnable module or script";
-  }
-
-  @Override
-  public Icon getIcon() {
-    return FregeIcons.FILE;
-  }
-
-  @Override
-  @NonNls
-  @NotNull
-  public String getId() {
-    return "FregeScriptRunConfiguration";
-  }
-
-  @Override
-  public ConfigurationFactory[] getConfigurationFactories() {
-    return new ConfigurationFactory[]{myConfigurationFactory};
-  }
-
-  private static class FregeFactory extends ConfigurationFactory {
-    public FregeFactory(ConfigurationType type) {
-      super(type);
+    public static FregeRunConfigurationType getInstance() {
+        return ConfigurationTypeUtil.findConfigurationType(FregeRunConfigurationType.class);
     }
 
     @Override
-    public boolean isApplicable(@NotNull Project project) {
-      return FileTypeIndex.containsFileOfType(FregeFileType.INSTANCE, GlobalSearchScope.allScope(project));
+    public String getDisplayName() {
+        return "Frege";
     }
 
     @Override
-    public RunConfiguration createTemplateConfiguration(Project project) {
-      return new FregeRunConfiguration(project, this, "Frege Run");
+    public String getConfigurationTypeDescription() {
+        return "Frege runnable module or script";
     }
 
-  }
+    @Override
+    public Icon getIcon() {
+        return FregeIcons.DEFAULT;
+    }
+
+    @Override
+    @NonNls
+    @NotNull
+    public String getId() {
+        return "FregeScriptRunConfiguration";
+    }
+
+    @Override
+    public ConfigurationFactory[] getConfigurationFactories() {
+        return new ConfigurationFactory[]{myConfigurationFactory};
+    }
+
+    private static class FregeFactory extends ConfigurationFactory {
+        public FregeFactory(ConfigurationType type) {
+            super(type);
+        }
+
+        @Override
+        public boolean isApplicable(@NotNull Project project) {
+            return FileTypeIndex.containsFileOfType(FregeFileType.INSTANCE, GlobalSearchScope.allScope(project));
+        }
+
+        @NotNull
+        @Override
+        public RunConfiguration createTemplateConfiguration(@NotNull Project project) {
+            return new FregeRunConfiguration(project, this, "Frege Run");
+        }
+
+    }
 }

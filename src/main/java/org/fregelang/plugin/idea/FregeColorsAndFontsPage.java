@@ -11,7 +11,8 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.util.Map;
 
-public class FregeColorSettingsPage  implements ColorSettingsPage {
+public class FregeColorsAndFontsPage implements ColorSettingsPage {
+
     private static final AttributesDescriptor[] DESCRIPTORS = new AttributesDescriptor[]{
         new AttributesDescriptor("Line Comment",    FregeSyntaxHighlighter.END_OF_LINE_COMMENT),
         new AttributesDescriptor("Block Comment",   FregeSyntaxHighlighter.BLOCK_COMMENT),
@@ -23,7 +24,7 @@ public class FregeColorSettingsPage  implements ColorSettingsPage {
     @Nullable
     @Override
     public Icon getIcon() {
-        return FregeIcons.FILE;
+        return FregeIcons.DEFAULT;
     }
 
     @NotNull

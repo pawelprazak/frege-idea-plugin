@@ -21,16 +21,21 @@ import org.jetbrains.annotations.NotNull;
 import java.io.Reader;
 
 public class FregeParserDefinition implements ParserDefinition {
-    
+
+    public static final IFileElementType FREGE_FILE = new IFileElementType(Language.findInstance(FregeLanguage.class));
+
     public static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);
     public static final TokenSet COMMENTS     = TokenSet.create(FregeTypes.END_OF_LINE_COMMENT);
-
-    public static final IFileElementType FILE = new IFileElementType(Language.<FregeLanguage>findInstance(FregeLanguage.class));
 
     @NotNull
     @Override
     public Lexer createLexer(Project project) {
         return new FlexAdapter(new FregeLexer((Reader) null));
+    }
+
+    @Override
+    public IFileElementType getFileNodeType() {
+        return FREGE_FILE;
     }
 
     @NotNull
@@ -42,22 +47,17 @@ public class FregeParserDefinition implements ParserDefinition {
     public TokenSet getCommentTokens() {
         return COMMENTS;
     }
- 
+
     @NotNull
     public TokenSet getStringLiteralElements() {
         return TokenSet.EMPTY;
     }
- 
+
     @NotNull
     public PsiParser createParser(final Project project) {
         return new FregeParser();
     }
- 
-    @Override
-    public IFileElementType getFileNodeType() {
-        return FILE;
-    }
- 
+
     public PsiFile createFile(FileViewProvider viewProvider) {
         return new FregeFile(viewProvider);
     }

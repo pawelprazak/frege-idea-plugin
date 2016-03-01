@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class FregeFileTypeFactory extends FileTypeFactory {
     @Override
-        public void createFileTypes(@NotNull FileTypeConsumer fileTypeConsumer) {
-            fileTypeConsumer.consume(FregeFileType.INSTANCE, "fr");
-        }
+    public void createFileTypes(@NotNull FileTypeConsumer consumer) {
+        consumer.consume(FregeFileType.INSTANCE, FregeFileType.DEFAULT_EXTENSION);
+    }
 }
