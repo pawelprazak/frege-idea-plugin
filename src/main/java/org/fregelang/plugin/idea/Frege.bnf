@@ -44,7 +44,8 @@ private item_ ::= (
    BACKQUOTE |     
    DOUBLE_ARROW |  
    EXCLAMATION |   
-   UNDERSCORE |    
+   UNDERSCORE |
+   MINUS |
    OPERATOR_CONS | 
    OPERATOR_ID |   
    AS_KW |         
@@ -75,11 +76,14 @@ private item_ ::= (
    UNSAFE |        
    WHERE_KW |      
    PRAGMA |        
-   NUMBER |        
-   CHARACTER |     
+   INTEGER |
+   CHAR |
    STRING |        
-   TH_TY_QUOTE |   
-   TH_VAR_QUOTE |  
-   TYPE_OR_CONS |  
-   ID
+   TYQUOTE |
+   SIMPLEQUOTE |
+   CONID |
+   VARID |
+   DUPIPVARID |
+   QCONID |
+   QVARID
   )

@@ -12,9 +12,9 @@ import com.intellij.psi.*;
 
 %%
 
+%unicode
 %class FregeLexer
 %implements FlexLexer
-%unicode
 
 %{
     private int commentStart;
@@ -29,7 +29,7 @@ import com.intellij.psi.*;
 %xstate BLOCK_COMMENT, TEX
 
 unispace    = \x05
-white_no_nl = [\ \r\t\f]|{unispace}
+white_no_nl = [\ \r\t\f\xA0]|{unispace}
 whitechar   = {white_no_nl}|[\n]
 tab         = \t
 
@@ -152,6 +152,8 @@ EOL_COMMENT = "--"[^\n]*
 "=>"                  { return FregeTypes.DOUBLE_ARROW; }
 "!"                   { return FregeTypes.EXCLAMATION; }
 "_"                   { return FregeTypes.UNDERSCORE; }
+"-"                   { return FregeTypes.MINUS; }
+
 ":"{symbol}+          { return FregeTypes.OPERATOR_CONS; }
 {symbol}+             { return FregeTypes.OPERATOR_ID; }
 
@@ -185,17 +187,22 @@ EOL_COMMENT = "--"[^\n]*
 "unsafe"              { return FregeTypes.UNSAFE; }
 "where"               { return FregeTypes.WHERE_KW; }
 "{-#".*"#-}"          { return FregeTypes.PRAGMA; }
+
 (0(o|O){octit}*) |
 (0(x|X){hexit}*) |
-({digit}+)            { return FregeTypes.NUMBER; }
+({digit}+) "#"?"#"?   { return FregeTypes.INTEGER; }
 
-{character}           { return FregeTypes.CHARACTER; }
+{character}           { return FregeTypes.CHAR; }
 {string}              { return FregeTypes.STRING;}
 
 "\\end{code}"         { yybegin(TEX); return FregeTypes.BLOCK_COMMENT; }
 
-"''"                  { return FregeTypes.TH_TY_QUOTE; }
-"'"                   { return FregeTypes.TH_VAR_QUOTE; }
-{large}{idchar}*      { return FregeTypes.TYPE_OR_CONS;}
-{small}{idchar}*      { return FregeTypes.ID; }
+
+"''"                  { return FregeTypes.TYQUOTE; }
+"'"                   { return FregeTypes.SIMPLEQUOTE; }
+{large}{idchar}* "#"* { return FregeTypes.CONID; }
+{small}{idchar}* "#"* { return FregeTypes.VARID; }
+"?"{small}{idchar}*   { return FregeTypes.DUPIPVARID; } // Extention ImplicitParams
+({large}{idchar}*".")+{large}{idchar}* "#"* { return FregeTypes.QCONID;}
+({large}{idchar}*".")+{small}{idchar}* "#"* { return FregeTypes.QVARID; }
 .                     { return TokenType.BAD_CHARACTER; }
