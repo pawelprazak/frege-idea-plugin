@@ -16,7 +16,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.util.IncorrectOperationException;
-import org.fregelang.plugin.idea.FregeFileType;
+import org.fregelang.plugin.idea.filetype.FregeFileType;
 import org.jetbrains.annotations.NotNull;
 
 public final class NewFregeFileAction extends CreateElementActionBase {

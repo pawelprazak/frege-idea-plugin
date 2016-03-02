@@ -44,23 +44,26 @@
         <!-- Add your extensions here -->
 
         <fileTypeFactory
-                implementation="org.fregelang.plugin.idea.FregeFileTypeFactory"/>
+                implementation="org.fregelang.plugin.idea.filetype.FregeFileTypeFactory"/>
+        <configurationType
+                implementation="org.fregelang.plugin.idea.run.FregeRunConfigurationType"/>
+        <colorSettingsPage
+                implementation="org.fregelang.plugin.idea.highlight.FregeColorsAndFontsPage"/>
         <lang.parserDefinition
                 language="Frege"
                 implementationClass="org.fregelang.plugin.idea.parser.FregeParserDefinition"/>
         <lang.syntaxHighlighterFactory
                 language="Frege"
                 implementationClass="org.fregelang.plugin.idea.highlight.FregeSyntaxHighlighterFactory"/>
-        <colorSettingsPage
-                implementation="org.fregelang.plugin.idea.highlight.FregeColorsAndFontsPage"/>
         <lang.commenter
                 language="Frege"
                 implementationClass="org.fregelang.plugin.idea.comment.FregeCommenter"/>
-        <configurationType
-                implementation="org.fregelang.plugin.idea.run.FregeRunConfigurationType"/>
         <lang.braceMatcher
                 language="Frege"
                 implementationClass="org.fregelang.plugin.idea.highlight.FregeBraceMatcher"/>
+        <lang.fileViewProviderFactory
+                language="Frege"
+                implementationClass="org.fregelang.plugin.idea.psi.FregeFileViewProviderFactory"/>
         <annotator
                 language="Frege"
                 implementationClass="org.fregelang.plugin.idea.highlight.FregeAnnotator"/>

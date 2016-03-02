@@ -1,4 +1,4 @@
-package org.fregelang.plugin.idea;
+package org.fregelang.plugin.idea.icon;
 
 import com.intellij.openapi.util.IconLoader;
 

@@ -7,8 +7,8 @@ import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
-import org.fregelang.plugin.idea.FregeFileType;
-import org.fregelang.plugin.idea.FregeIcons;
+import org.fregelang.plugin.idea.filetype.FregeFileType;
+import org.fregelang.plugin.idea.icon.FregeIcons;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 

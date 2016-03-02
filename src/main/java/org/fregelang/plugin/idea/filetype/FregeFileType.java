@@ -1,7 +1,9 @@
-package org.fregelang.plugin.idea;
+package org.fregelang.plugin.idea.filetype;
 
 import com.intellij.openapi.fileTypes.LanguageFileType;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.fregelang.plugin.idea.FregeLanguage;
+import org.fregelang.plugin.idea.icon.FregeIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
