@@ -1,4 +1,4 @@
-package org.fregelang.plugin.idea.highlighter;
+package org.fregelang.plugin.idea.highlight;
 
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighter;

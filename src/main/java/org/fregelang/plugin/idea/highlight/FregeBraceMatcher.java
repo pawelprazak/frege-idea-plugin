@@ -1,4 +1,4 @@
-package org.fregelang.plugin.idea.highlighter;
+package org.fregelang.plugin.idea.highlight;
 
 import com.intellij.lang.BracePair;
 import com.intellij.lang.PairedBraceMatcher;

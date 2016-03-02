@@ -44,9 +44,9 @@
                 implementationClass="org.fregelang.plugin.idea.parser.FregeParserDefinition"/>
         <lang.syntaxHighlighterFactory
                 language="Frege"
-                implementationClass="org.fregelang.plugin.idea.highlighter.FregeSyntaxHighlighterFactory"/>
+                implementationClass="org.fregelang.plugin.idea.highlight.FregeSyntaxHighlighterFactory"/>
         <colorSettingsPage
-                implementation="org.fregelang.plugin.idea.highlighter.FregeColorsAndFontsPage"/>
+                implementation="org.fregelang.plugin.idea.highlight.FregeColorsAndFontsPage"/>
         <lang.commenter
                 language="Frege"
                 implementationClass="org.fregelang.plugin.idea.comment.FregeCommenter"/>
@@ -54,7 +54,7 @@
                 implementation="org.fregelang.plugin.idea.run.FregeRunConfigurationType"/>
         <lang.braceMatcher
                 language="Frege"
-                implementationClass="org.fregelang.plugin.idea.highlighter.FregeBraceMatcher"/>
+                implementationClass="org.fregelang.plugin.idea.highlight.FregeBraceMatcher"/>
 
         <!-- future use  -->
 

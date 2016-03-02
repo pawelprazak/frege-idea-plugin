@@ -1,4 +1,4 @@
-package org.fregelang.plugin.idea.highlighter;
+package org.fregelang.plugin.idea.highlight;
 
 import com.google.common.collect.ImmutableMap;
 import com.intellij.lang.annotation.HighlightSeverity;
