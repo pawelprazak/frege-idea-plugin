@@ -55,6 +55,9 @@
         <lang.braceMatcher
                 language="Frege"
                 implementationClass="org.fregelang.plugin.idea.highlight.FregeBraceMatcher"/>
+        <annotator
+                language="Frege"
+                implementationClass="org.fregelang.plugin.idea.highlight.FregeAnnotator"/>
 
         <!-- future use  -->
 
@@ -65,9 +68,6 @@
             <completion.contributor
               language="Frege"
               implementationClass="org.fregelang.plugin.idea.FregeCompletionContributor"/>
-            <annotator
-              language="Frege"
-              implementationClass="org.fregelang.plugin.idea.FregeAnnotator"/>
             <applicationService
               serviceImplementation="org.fregelang.plugin.idea.config.FregeSettings"/>
             <externalAnnotator
