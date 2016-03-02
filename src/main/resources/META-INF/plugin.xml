@@ -24,6 +24,12 @@
 
     <actions>
         <!-- Add your actions here -->
+
+        <action id="Frege.FregeFile" class="org.fregelang.plugin.idea.actions.NewFregeFileAction"
+                text="Frege Module" description="Create new Frege module">
+            <add-to-group group-id="NewGroup"/>
+        </action>
+
     </actions>
 
     <application-components>
