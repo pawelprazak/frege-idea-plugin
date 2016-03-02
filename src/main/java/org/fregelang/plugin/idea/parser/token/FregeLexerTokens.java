@@ -2,6 +2,7 @@ package org.fregelang.plugin.idea.parser.token;
 
 import com.google.common.collect.ImmutableList;
 import com.intellij.psi.TokenType;
+import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import org.fregelang.plugin.idea.psi.FregeTokenType;
 import org.fregelang.plugin.idea.psi.FregeTypes;
@@ -74,4 +75,12 @@ public class FregeLexerTokens implements FregeTypes {
     );
 
     private static final TokenSet WHITESPACES = TokenSet.create(TokenType.WHITE_SPACE, NEW_LINE);
+
+    /* We'll have to decide on wheter follow the Haskell plugin nomenclature or leave as is, for now let's hava aliases */
+    public static final IElementType OPAREN = LEFT_PAREN;
+    public static final IElementType CPAREN = RIGHT_PAREN;
+    public static final IElementType OCURLY = LEFT_BRACE;
+    public static final IElementType CCURLY = RIGHT_BRACE;
+    public static final IElementType OBRACK = LEFT_BRACKET;
+    public static final IElementType CBRACK = RIGHT_BRACKET;
 }

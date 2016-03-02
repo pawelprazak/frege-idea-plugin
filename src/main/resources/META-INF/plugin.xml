@@ -52,6 +52,9 @@
                 implementationClass="org.fregelang.plugin.idea.comment.FregeCommenter"/>
         <configurationType
                 implementation="org.fregelang.plugin.idea.run.FregeRunConfigurationType"/>
+        <lang.braceMatcher
+                language="Frege"
+                implementationClass="org.fregelang.plugin.idea.highlighter.FregeBraceMatcher"/>
 
         <!-- future use  -->
 
@@ -67,9 +70,6 @@
               implementationClass="org.fregelang.plugin.idea.FregeAnnotator"/>
             <applicationService
               serviceImplementation="org.fregelang.plugin.idea.config.FregeSettings"/>
-            <lang.braceMatcher
-              language="Frege"
-              implementationClass="org.fregelang.plugin.idea.FregeBraceMatcher"/>
             <externalAnnotator
               language="Frege"
               implementationClass="org.fregelang.plugin.idea.FregeExternalAnnotator"/>
