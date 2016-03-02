@@ -1,4 +1,4 @@
-package org.fregelang.plugin.idea;
+package org.fregelang.plugin.idea.parser.lexer;
 
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
@@ -13,7 +13,7 @@ import com.intellij.psi.*;
 %%
 
 %unicode
-%class FregeLexer
+%class _FregeLexer
 %implements FlexLexer
 
 %{

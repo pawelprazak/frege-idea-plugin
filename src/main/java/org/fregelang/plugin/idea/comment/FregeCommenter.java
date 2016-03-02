@@ -1,4 +1,4 @@
-package org.fregelang.plugin.idea;
+package org.fregelang.plugin.idea.comment;
 
 import com.intellij.lang.Commenter;
 import org.jetbrains.annotations.Nullable;

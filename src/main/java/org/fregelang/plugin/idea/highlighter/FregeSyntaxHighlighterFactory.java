@@ -1,4 +1,4 @@
-package org.fregelang.plugin.idea;
+package org.fregelang.plugin.idea.highlighter;
 
 import com.intellij.openapi.fileTypes.SingleLazyInstanceSyntaxHighlighterFactory;
 import com.intellij.openapi.fileTypes.SyntaxHighlighter;

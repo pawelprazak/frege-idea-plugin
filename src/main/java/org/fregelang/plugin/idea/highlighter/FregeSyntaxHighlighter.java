@@ -1,14 +1,14 @@
-package org.fregelang.plugin.idea;
+package org.fregelang.plugin.idea.highlighter;
 
 import com.google.common.collect.ImmutableMap;
 import com.intellij.lang.annotation.HighlightSeverity;
-import com.intellij.lexer.FlexAdapter;
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.tree.IElementType;
+import org.fregelang.plugin.idea.parser.lexer.FregeLexerAdapter;
 import org.fregelang.plugin.idea.parser.token.FregeLexerTokens;
 import org.jetbrains.annotations.NotNull;
 
@@ -104,7 +104,7 @@ public class FregeSyntaxHighlighter extends SyntaxHighlighterBase {
     @NotNull
     @Override
     public Lexer getHighlightingLexer() {
-        return new FlexAdapter(new FregeLexer(null));
+        return new FregeLexerAdapter();
     }
 
     @NotNull

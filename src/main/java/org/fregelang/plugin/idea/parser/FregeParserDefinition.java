@@ -1,10 +1,9 @@
-package org.fregelang.plugin.idea;
+package org.fregelang.plugin.idea.parser;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
 import com.intellij.lang.ParserDefinition;
 import com.intellij.lang.PsiParser;
-import com.intellij.lexer.FlexAdapter;
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.FileViewProvider;
@@ -13,12 +12,12 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
+import org.fregelang.plugin.idea.FregeLanguage;
 import org.fregelang.plugin.idea.parser.FregeParser;
+import org.fregelang.plugin.idea.parser.lexer.FregeLexerAdapter;
 import org.fregelang.plugin.idea.psi.FregeFile;
 import org.fregelang.plugin.idea.psi.FregeTypes;
 import org.jetbrains.annotations.NotNull;
-
-import java.io.Reader;
 
 public class FregeParserDefinition implements ParserDefinition {
 
@@ -30,7 +29,7 @@ public class FregeParserDefinition implements ParserDefinition {
     @NotNull
     @Override
     public Lexer createLexer(Project project) {
-        return new FlexAdapter(new FregeLexer((Reader) null));
+        return new FregeLexerAdapter();
     }
 
     @Override

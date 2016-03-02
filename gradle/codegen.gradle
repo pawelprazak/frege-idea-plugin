@@ -39,7 +39,7 @@ task unzipGrammarKit(type: Copy) {
 task generateBnfSources(type: JavaExec) {
     dependsOn unzipGrammarKit
     main = 'org.intellij.grammar.Main'
-    args "$buildDir/generatedSources", "src/main/java/org/fregelang/plugin/idea/Frege.bnf"
+    args "$buildDir/generatedSources", "src/main/java/org/fregelang/plugin/idea/parser/Frege.bnf"
     classpath = configurations.bnf + configurations.compile
 }
 
@@ -62,8 +62,8 @@ task generateFlexSources(type: JavaExec) {
             '-skel',
             "$buildDir/tools/idea-flex.skeleton",
             '-d',
-            "$buildDir/generatedSources/org/fregelang/plugin/idea",
-            "src/main/java/org/fregelang/plugin/idea/Frege.flex",
+            "$buildDir/generatedSources/org/fregelang/plugin/idea/parser/lexer",
+            "src/main/java/org/fregelang/plugin/idea/parser/lexer/Frege.flex",
     ])
     classpath = configurations.jflex
 }

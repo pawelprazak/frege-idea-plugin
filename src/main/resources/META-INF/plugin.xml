@@ -41,15 +41,15 @@
                 implementation="org.fregelang.plugin.idea.FregeFileTypeFactory"/>
         <lang.parserDefinition
                 language="Frege"
-                implementationClass="org.fregelang.plugin.idea.FregeParserDefinition"/>
+                implementationClass="org.fregelang.plugin.idea.parser.FregeParserDefinition"/>
         <lang.syntaxHighlighterFactory
                 language="Frege"
-                implementationClass="org.fregelang.plugin.idea.FregeSyntaxHighlighterFactory"/>
+                implementationClass="org.fregelang.plugin.idea.highlighter.FregeSyntaxHighlighterFactory"/>
         <colorSettingsPage
-                implementation="org.fregelang.plugin.idea.FregeColorsAndFontsPage"/>
+                implementation="org.fregelang.plugin.idea.highlighter.FregeColorsAndFontsPage"/>
         <lang.commenter
                 language="Frege"
-                implementationClass="org.fregelang.plugin.idea.FregeCommenter"/>
+                implementationClass="org.fregelang.plugin.idea.comment.FregeCommenter"/>
         <configurationType
                 implementation="org.fregelang.plugin.idea.run.FregeRunConfigurationType"/>
 
