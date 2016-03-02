@@ -13,8 +13,7 @@ import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
 import org.fregelang.plugin.idea.FregeLanguage;
-import org.fregelang.plugin.idea.parser.FregeParser;
-import org.fregelang.plugin.idea.parser.lexer.FregeLexerAdapter;
+import org.fregelang.plugin.idea.parser.lexer.FregeLexer;
 import org.fregelang.plugin.idea.psi.FregeFile;
 import org.fregelang.plugin.idea.psi.FregeTypes;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +28,7 @@ public class FregeParserDefinition implements ParserDefinition {
     @NotNull
     @Override
     public Lexer createLexer(Project project) {
-        return new FregeLexerAdapter();
+        return new FregeLexer();
     }
 
     @Override
