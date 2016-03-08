@@ -42,9 +42,13 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
+        <errorHandler implementation="com.intellij.diagnostic.ITNReporter"/>
 
         <fileTypeFactory
                 implementation="org.fregelang.plugin.idea.filetype.FregeFileTypeFactory"/>
+        <moduleType
+                id="FREGE_MODULE" classpathProvider="false"
+                implementationClass="org.fregelang.plugin.idea.module.FregeModuleType"/>
         <configurationType
                 implementation="org.fregelang.plugin.idea.run.FregeRunConfigurationType"/>
         <colorSettingsPage
@@ -67,6 +71,8 @@
         <annotator
                 language="Frege"
                 implementationClass="org.fregelang.plugin.idea.highlight.FregeAnnotator"/>
+
+        <framework.type implementation="org.fregelang.plugin.idea.framework.FregeFrameworkType"/>
 
         <!-- future use  -->
 
