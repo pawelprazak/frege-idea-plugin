@@ -10,3 +10,15 @@ The bnf only lists the tokens such that the parser generation works.
 
 The lexer is copied from [the haskell plugin](http://github.com/Atsky/haskell-idea-plugin)
 with only few modifications. More will be needed.
+
+### Developing the plugin
+
+#### Resources
+
+[IntelliJ IDEA Plugin Development Guide](http://confluence.jetbrains.com/display/IDEADEV/PluginDevelopment)
+
+[Plugin Development FAQ](http://confluence.jetbrains.com/display/IDEADEV/Plugin+Development+FAQ)
+
+[IntelliJ IDEA Architectural Overview](http://confluence.jetbrains.com/display/IDEADEV/IntelliJ+IDEA+Architectural+Overview)
+
+
