@@ -2,9 +2,11 @@ package org.fregelang.plugin.idea.framework;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import com.intellij.openapi.roots.JavadocOrderRootType;
 import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.roots.libraries.NewLibraryConfiguration;
 import com.intellij.openapi.roots.ui.configuration.libraryEditor.LibraryEditor;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.*;
@@ -12,6 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
+import static org.fregelang.plugin.idea.framework.Files.toLibraryRootURL;
 
 public class FregeSdkDescriptor {
 
@@ -54,25 +57,26 @@ public class FregeSdkDescriptor {
         return sourceFiles;
     }
 
-    def createNewLibraryConfiguration() = {
-        val properties = new ScalaLibraryProperties()
+    public NewLibraryConfiguration createNewLibraryConfiguration() {
+        FregeLibraryProperties properties = new FregeLibraryProperties();
 
-        properties.languageLevel = version.flatMap(ScalaLanguageLevel.from).getOrElse(ScalaLanguageLevel.Default)
-        properties.compilerClasspath = compilerFiles
+        properties.setLanguageLevel(version.flatMap(FregeLanguageLevel::from).orElse(FregeLanguageLevel.DEFAULT));
+        properties.setCompilerClasspath(compilerFiles);
 
-        val name = "scala-sdk-" + version.map(_.number).getOrElse("Unknown")
+        String name = "scala-sdk-" + version.map(Version::getNumber).orElse("Unknown");
 
-        return new NewLibraryConfiguration(name, FregeLibraryType.instance, properties) {
-            override def addRoots(editor:LibraryEditor): Unit = {
-                libraryFiles.map(_.toLibraryRootURL).foreach(editor.addRoot(_, OrderRootType.CLASSES))
-                sourceFiles.map(_.toLibraryRootURL).foreach(editor.addRoot(_, OrderRootType.SOURCES))
-                docFiles.map(_.toLibraryRootURL).foreach(editor.addRoot(_, JavadocOrderRootType.getInstance))
+        return new NewLibraryConfiguration(name, FregeLibraryType.INSTANCE, properties) {
+            @Override
+            public void addRoots(@NotNull LibraryEditor editor) {
+                libraryFiles.stream().map(toLibraryRootURL).forEach(r -> editor.addRoot(r, OrderRootType.CLASSES));
+                sourceFiles.stream().map(toLibraryRootURL).forEach(r -> editor.addRoot(r, OrderRootType.SOURCES));
+                docFiles.stream().map(toLibraryRootURL).forEach(r -> editor.addRoot(r, JavadocOrderRootType.getInstance()));
 
-                if (sourceFiles.isEmpty && docFiles.isEmpty) {
-                    editor.addRoot(ScalaSdk.documentationUrlFor(version), JavadocOrderRootType.getInstance)
+                if (sourceFiles.isEmpty() && docFiles.isEmpty()) {
+                    editor.addRoot(FregeSdk.documentationUrlFor(version), JavadocOrderRootType.getInstance());
                 }
             }
-        }
+        };
     }
 
     @Override
@@ -151,7 +155,7 @@ public class FregeSdkDescriptor {
         } else {
             throw new RuntimeException("Not found: " + missingBinaryArtifacts.stream()
                     .map(Component.Artifact::getTitle)
-                    .reduce((a,b) -> a+", "+b));
+                    .reduce((a, b) -> a + ", " + b));
         }
     }
 }

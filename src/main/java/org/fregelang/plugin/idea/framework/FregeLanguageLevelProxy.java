@@ -1,13 +1,11 @@
 package org.fregelang.plugin.idea.framework;
 
 import com.google.common.collect.ImmutableBiMap;
-import com.google.common.collect.ImmutableMap;
 
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -55,6 +53,12 @@ public enum FregeLanguageLevelProxy {
                 .map(FregeLanguageLevelProxy::proxyToLevel)
                 .filter(matcher)
                 .findFirst();
+    }
+
+    public static FregeLanguageLevel[] findAll() {
+        return Arrays.asList(values()).stream()
+                .map(FregeLanguageLevelProxy::getInstance)
+                .toArray(FregeLanguageLevel[]::new);
     }
 
     public static class Frege_3_20 extends FregeLanguageLevel {

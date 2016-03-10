@@ -6,8 +6,8 @@ import java.util.Optional;
 
 public class FregeLanguageLevel implements Named, Comparison<FregeLanguageLevel> {
 
-    public static final FregeLanguageLevelProxy DEFAULT = FregeLanguageLevelProxy.Frege_3_23;
-    public static final FregeLanguageLevelProxy[] VALUES = FregeLanguageLevelProxy.Frege_3_23.values();
+    public static final FregeLanguageLevel DEFAULT = FregeLanguageLevelProxy.Frege_3_23.getInstance();
+    public static final FregeLanguageLevel[] VALUES = FregeLanguageLevelProxy.findAll();
 
     private final int ordinal;
     private final String version;

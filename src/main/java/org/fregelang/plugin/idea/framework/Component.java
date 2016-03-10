@@ -163,6 +163,7 @@ public class Component {
 
         public static class FregeLibrary extends Artifact {
             public static final FregeLibrary INSTANCE = new FregeLibrary();
+
             public FregeLibrary() {
                 super("frege-library", Optional.of("library.properties"));
             }
@@ -170,6 +171,7 @@ public class Component {
 
         public static class FregeCompiler extends Artifact {
             public static final FregeCompiler INSTANCE = new FregeCompiler();
+
             private FregeCompiler() {
                 super("frege-compiler", Optional.of("compiler.properties"));
             }
@@ -192,6 +194,7 @@ public class Component {
 
         public static class Binaries extends Kind {
             public static Binaries INSTANCE = new Binaries();
+
             private Binaries() {
                 super(".*(?<!-src|-sources|-javadoc)\\.jar");
             }
@@ -199,6 +202,7 @@ public class Component {
 
         public static class Sources extends Kind {
             public static Sources INSTANCE = new Sources();
+
             public Sources() {
                 super(".*-(src|sources)\\.jar");
             }
@@ -206,6 +210,7 @@ public class Component {
 
         public static class Docs extends Kind {
             public static Docs INSTANCE = new Docs();
+
             public Docs() {
                 super(".*-javadoc\\.jar");
             }

@@ -17,7 +17,6 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -96,7 +95,7 @@ public class SdkSelectionDialog extends JDialog {
         try {
             scalaVersions = withProgressSynchronously(
                     "Fetching available Frege versions", textSetter -> Versions.loadScalaVersions());
-         } catch (Exception e) {
+        } catch (Exception e) {
             Messages.showErrorDialog(contentPane, e.getMessage(), "Error Downloading Frege Versions");
             return;
         }
@@ -111,7 +110,10 @@ public class SdkSelectionDialog extends JDialog {
             try {
                 withProgressSynchronously(
                         format("Downloading Frege %s (via Maven)", version),
-                        (listener) -> { Downloader.downloadScala(version, listener); return (Void) null; }
+                        (listener) -> {
+                            Downloader.downloadScala(version, listener);
+                            return (Void) null;
+                        }
                 );
             } catch (Exception e) {
                 Messages.showErrorDialog(contentPane, e.getMessage(), "Error Downloading Frege " + version);

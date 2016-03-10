@@ -8,7 +8,7 @@ import java.util.Arrays;
 public class FregeLibraryPropertiesState {
 
     // We have to rely on the Java's enumeration for serialization
-    public FregeLanguageLevelProxy languageLevel = FregeLanguageLevel.DEFAULT;
+    public FregeLanguageLevelProxy languageLevel = FregeLanguageLevel.DEFAULT.proxy();
 
     @Tag("compiler-classpath")
     @AbstractCollection(surroundWithTag = false, elementTag = "root", elementValueAttribute = "url")

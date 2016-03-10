@@ -1,9 +1,12 @@
 package org.fregelang.plugin.idea.framework;
 
+import com.intellij.openapi.vfs.VfsUtil;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 public class Files {
@@ -18,8 +21,18 @@ public class Files {
         );
     }
 
+//    def parent: Option[File] = Option(delegate.getParentFile)
+
+//    def children: Seq[File] = Option(delegate.listFiles).map(_.toSeq).getOrElse(Seq.empty)
+
+//    def directories: Seq[File] = children.filter(_.isDirectory)
+
+//    def files: Seq[File] = children.filter(_.isFile)
+
     public static List<File> allFiles(File file) {
         File[] files = file.listFiles();
         return files == null ? new ArrayList<>() : Arrays.asList(files);
     }
+
+    public static Function<File, String> toLibraryRootURL = VfsUtil::getUrlForLibraryRoot;
 }

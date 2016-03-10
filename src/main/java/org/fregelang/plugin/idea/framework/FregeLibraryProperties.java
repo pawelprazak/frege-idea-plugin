@@ -22,6 +22,22 @@ public class FregeLibraryProperties extends LibraryProperties<FregeLibraryProper
         loadState(new FregeLibraryPropertiesState());
     }
 
+    public FregeLanguageLevel getLanguageLevel() {
+        return languageLevel;
+    }
+
+    public void setLanguageLevel(FregeLanguageLevel languageLevel) {
+        this.languageLevel = languageLevel;
+    }
+
+    public List<File> getCompilerClasspath() {
+        return compilerClasspath;
+    }
+
+    public void setCompilerClasspath(List<File> compilerClasspath) {
+        this.compilerClasspath = compilerClasspath;
+    }
+
     @Override
     public void loadState(FregeLibraryPropertiesState state) {
         this.languageLevel = FregeLanguageLevel.from(state.languageLevel);
