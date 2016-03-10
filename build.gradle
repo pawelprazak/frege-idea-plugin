@@ -34,3 +34,19 @@ dependencies {
     provided files("${System.properties['java.home']}/../lib/tools.jar")
 }
 sourceSets.main.java.srcDirs = ['src/main/java', 'gen', "$buildDir/generatedSources"]
+
+import org.apache.tools.ant.filters.ReplaceTokens
+
+processResources {
+    filter ReplaceTokens, tokens: [
+        pluginVersion: pluginVersion(projectVersion)
+    ]
+}
+
+def pluginVersion(baseVersion) {
+    def gitCommand = "git rev-parse --short HEAD"
+    def proc = gitCommand.execute()
+    def revision = proc.text.trim()
+    def timestamp = (int)(new Date().getTime()/1000)
+    return baseVersion + '-' + revision + '-' + timestamp
+}
