@@ -40,6 +40,10 @@
         <!-- Add your project components here -->
     </project-components>
 
+    <extensionPoints>
+        <extensionPoint name="fregeFileFactory" interface="org.fregelang.plugin.idea.extensions.FregeFileFactory"/>
+    </extensionPoints>
+
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
         <errorHandler implementation="com.intellij.diagnostic.ITNReporter"/>
