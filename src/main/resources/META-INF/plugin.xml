@@ -52,9 +52,6 @@
 
         <fileTypeFactory
                 implementation="org.fregelang.plugin.idea.filetype.FregeFileTypeFactory"/>
-        <moduleType
-                id="FREGE_MODULE" classpathProvider="false"
-                implementationClass="org.fregelang.plugin.idea.module.FregeModuleType"/>
         <configurationType
                 implementation="org.fregelang.plugin.idea.run.FregeRunConfigurationType"/>
         <colorSettingsPage
@@ -81,6 +78,7 @@
                 language="Frege"
                 implementationClass="org.fregelang.plugin.idea.highlight.FregeAnnotator"/>
 
+        <projectTemplatesFactory implementation="org.fregelang.plugin.idea.project.FregeProjectTemplatesFactory"/>
         <framework.type implementation="org.fregelang.plugin.idea.framework.FregeFrameworkType"/>
         <library.type implementation="org.fregelang.plugin.idea.framework.FregeLibraryType" />
 
