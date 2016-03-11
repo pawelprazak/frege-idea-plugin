@@ -4,22 +4,32 @@ plugins {
     id 'nebula.provided-base' version '3.0.3' // if you want provided-base
 }
 
-repositories {
-    mavenLocal()
-    mavenCentral()
-}
-
+apply plugin: 'idea'
 apply plugin: 'org.jetbrains.intellij'
 apply plugin: 'de.undercouch.download'
 apply plugin: 'nebula.provided-base'
 
 apply from: 'gradle/codegen.gradle'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+def javaVersion = JavaVersion.VERSION_1_8
+
+sourceCompatibility = javaVersion
+targetCompatibility = javaVersion
+
+idea {
+    project {
+        jdkName = javaVersion
+        languageLevel = javaVersion
+    }
+}
 
 intellij {
-    version '15.0.4'
+    version = ideaVersion
     pluginName 'Frege'
 
     publish {

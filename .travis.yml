@@ -18,8 +18,13 @@ env:
 #env:
 #  global:
   # JetBrains plugin release credentials
+  # JETBRAINS_USER
   #- secure: ...
+  # JETBRAINS_PASS
   #- secure: ...
 
-before_install:
+before_script:
  - chmod +x gradlew
+
+script:
+- ./gradlew buildPlugin -PideaVersion=$IDEA_VERSION
