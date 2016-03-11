@@ -6,6 +6,7 @@
     <vendor email="rahul.som@gmail.com" url="https://github.com/Frege/frege">The Frege Team</vendor>
 
     <change-notes><![CDATA[
+      0.1.5 - Support for Frege SDK selection and download
       0.1.4 - Support for more versions of IDEA <br/>
       0.1.3 - Frege Compiler is now picked from classpath <br/>
       0.1.2 - Run is now much faster because Compiler is reused. <br/>
