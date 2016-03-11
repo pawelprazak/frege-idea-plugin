@@ -1,5 +1,6 @@
 package org.fregelang.plugin.idea.framework;
 
+import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.vfs.VfsUtil;
 
 import java.io.File;
@@ -11,13 +12,17 @@ import java.util.stream.Stream;
 
 public class Files {
 
+    public static Stream<File> allFiles(File file) {
+        return allFiles(ImmutableList.of(file));
+    }
+
     public static Stream<File> allFiles(List<File> files) {
         if (files == null) {
             return Stream.empty();
         }
         return Stream.concat(
                 files.stream().filter(File::isFile),
-                files.stream().filter(File::isDirectory).flatMap(file -> allFiles(allFiles(file)))
+                files.stream().filter(File::isDirectory).flatMap(file -> allFiles(innerAllFiles(file)))
         );
     }
 
@@ -29,7 +34,7 @@ public class Files {
 
 //    def files: Seq[File] = children.filter(_.isFile)
 
-    public static List<File> allFiles(File file) {
+    private static List<File> innerAllFiles(File file) {
         File[] files = file.listFiles();
         return files == null ? new ArrayList<>() : Arrays.asList(files);
     }

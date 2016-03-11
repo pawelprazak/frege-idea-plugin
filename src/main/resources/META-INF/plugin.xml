@@ -42,7 +42,8 @@
     </project-components>
 
     <extensionPoints>
-        <extensionPoint name="fregeFileFactory" interface="org.fregelang.plugin.idea.extensions.FregeFileFactory"/>
+        <!-- Add your project extension points here -->
+        <!--<extensionPoint name="fregeFileFactory" interface="org.fregelang.plugin.idea.extensions.FregeFileFactory"/>-->
     </extensionPoints>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -58,6 +59,8 @@
                 implementation="org.fregelang.plugin.idea.run.FregeRunConfigurationType"/>
         <colorSettingsPage
                 implementation="org.fregelang.plugin.idea.highlight.FregeColorsAndFontsPage"/>
+        <iconProvider implementation="org.fregelang.plugin.idea.icon.FregeIconProvider"/>
+
         <lang.parserDefinition
                 language="Frege"
                 implementationClass="org.fregelang.plugin.idea.parser.FregeParserDefinition"/>
@@ -73,11 +76,13 @@
         <lang.fileViewProviderFactory
                 language="Frege"
                 implementationClass="org.fregelang.plugin.idea.psi.FregeFileViewProviderFactory"/>
+
         <annotator
                 language="Frege"
                 implementationClass="org.fregelang.plugin.idea.highlight.FregeAnnotator"/>
 
         <framework.type implementation="org.fregelang.plugin.idea.framework.FregeFrameworkType"/>
+        <library.type implementation="org.fregelang.plugin.idea.framework.FregeLibraryType" />
 
         <!-- future use  -->
 

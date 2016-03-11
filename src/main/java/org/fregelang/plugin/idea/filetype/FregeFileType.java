@@ -1,18 +1,26 @@
 package org.fregelang.plugin.idea.filetype;
 
 import com.intellij.openapi.fileTypes.LanguageFileType;
+import com.intellij.openapi.vfs.CharsetToolkit;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.encoding.EncodingRegistry;
 import org.fregelang.plugin.idea.FregeLanguage;
 import org.fregelang.plugin.idea.icon.FregeIcons;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.nio.charset.Charset;
 
 public class FregeFileType extends LanguageFileType {
 
-    public static final FregeFileType INSTANCE = new FregeFileType();
+    public
+    static final FregeFileType INSTANCE = new FregeFileType();
+    @NonNls
     public static final String DEFAULT_EXTENSION = "fr";
+    @NonNls
+    public static final String DOT_DEFAULT_EXTENSION = "." + DEFAULT_EXTENSION;
 
     private FregeFileType() {
         super(FregeLanguage.INSTANCE);
@@ -21,13 +29,13 @@ public class FregeFileType extends LanguageFileType {
     @NotNull
     @Override
     public String getName() {
-        return "Frege file";
+        return "Frege";
     }
 
     @NotNull
     @Override
     public String getDescription() {
-        return "Frege language file";
+        return "Frege language files";
     }
 
     @NotNull
@@ -39,11 +47,12 @@ public class FregeFileType extends LanguageFileType {
     @Nullable
     @Override
     public Icon getIcon() {
-        return FregeIcons.DEFAULT;
+        return FregeIcons.FILE_TYPE;
     }
 
     @Override
-    public String getCharset(@NotNull VirtualFile file, @NotNull byte[] content) {
-        return "UTF-8";
+    public String getCharset(@NotNull VirtualFile file, @NotNull final byte[] content) {
+        Charset charset = EncodingRegistry.getInstance().getDefaultCharset();
+        return charset.name();
     }
 }

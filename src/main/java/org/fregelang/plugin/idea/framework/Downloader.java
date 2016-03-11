@@ -15,7 +15,7 @@ public class Downloader {
 
     public static final String MAVEN_DEPENDENCY_PLUGIN_VERSION = "2.8";
 
-    public static void downloadScala(String version, Consumer<String> listener) throws DownloadException {
+    public static void downloadFrege(String version, Consumer<String> listener) throws DownloadException {
         StringBuffer buffer = new StringBuffer();
 
         Process process;

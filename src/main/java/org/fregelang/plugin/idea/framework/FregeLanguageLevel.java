@@ -6,8 +6,13 @@ import java.util.Optional;
 
 public class FregeLanguageLevel implements Named, Comparison<FregeLanguageLevel> {
 
-    public static final FregeLanguageLevel DEFAULT = FregeLanguageLevelProxy.Frege_3_23.getInstance();
-    public static final FregeLanguageLevel[] VALUES = FregeLanguageLevelProxy.findAll();
+    public static final FregeLanguageLevel DEFAULT = new Frege_3_23();
+    public static final FregeLanguageLevel[] VALUES = new FregeLanguageLevel[] {
+            new Frege_3_23(),
+            new Frege_3_22(),
+            new Frege_3_21(),
+            new Frege_3_20()
+    };
 
     private final int ordinal;
     private final String version;
@@ -53,5 +58,29 @@ public class FregeLanguageLevel implements Named, Comparison<FregeLanguageLevel>
 
     public static Optional<FregeLanguageLevel> from(Version version) {
         return FregeLanguageLevelProxy.findFirst(v -> version.getNumber().startsWith(v.getVersion()));
+    }
+
+    public static class Frege_3_20 extends FregeLanguageLevel {
+        public Frege_3_20() {
+            super(0, "3.20");
+        }
+    }
+
+    public static class Frege_3_21 extends FregeLanguageLevel {
+        public Frege_3_21() {
+            super(1, "3.21");
+        }
+    }
+
+    public static class Frege_3_22 extends FregeLanguageLevel {
+        public Frege_3_22() {
+            super(2, "3.22");
+        }
+    }
+
+    public static class Frege_3_23 extends FregeLanguageLevel {
+        public Frege_3_23() {
+            super(3, "3.23");
+        }
     }
 }

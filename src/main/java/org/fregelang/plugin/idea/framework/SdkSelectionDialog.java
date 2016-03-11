@@ -1,5 +1,6 @@
 package org.fregelang.plugin.idea.framework;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.ui.Messages;
@@ -28,6 +29,8 @@ import static java.lang.String.format;
 public class SdkSelectionDialog extends JDialog {
     private static final long serialVersionUID = 0L;
 
+    private static final Logger log = Logger.getInstance(SdkSelectionDialog.class);
+
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -42,10 +45,12 @@ public class SdkSelectionDialog extends JDialog {
 
     public SdkSelectionDialog(JComponent parent, Supplier<List<SdkChoice>> provider) {
         super((Window) parent.getTopLevelAncestor());
+
         myParent = parent;
         myProvider = provider;
 
         setTitle("Select JAR's for the new Frege SDK");
+
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
@@ -70,6 +75,10 @@ public class SdkSelectionDialog extends JDialog {
         updateTable();
     }
 
+    public int count() {
+        return myTableModel.getRowCount();
+    }
+
     private void updateTable() {
         List<SdkChoice> sdks = myProvider.get();
 
@@ -91,18 +100,19 @@ public class SdkSelectionDialog extends JDialog {
     }
 
     private void onDownload() {
-        List<String> scalaVersions;
+        List<String> fregeVersions;
         try {
-            scalaVersions = withProgressSynchronously(
-                    "Fetching available Frege versions", textSetter -> Versions.loadScalaVersions());
+            fregeVersions = withProgressSynchronously(
+                    "Fetching available Frege versions", textSetter -> Versions.loadFregeVersions());
         } catch (Exception e) {
+            log.error("Frege SDK download error", e);
             Messages.showErrorDialog(contentPane, e.getMessage(), "Error Downloading Frege Versions");
             return;
         }
 
         final SelectionDialog<String> dialog = new SelectionDialog<>(
                 contentPane, "Download (via Maven)", "Frege version:",
-                scalaVersions.toArray(new String[scalaVersions.size()]));
+                fregeVersions.toArray(new String[fregeVersions.size()]));
 
         if (dialog.showAndGet()) {
             final String version = dialog.getSelectedValue();
@@ -111,11 +121,12 @@ public class SdkSelectionDialog extends JDialog {
                 withProgressSynchronously(
                         format("Downloading Frege %s (via Maven)", version),
                         (listener) -> {
-                            Downloader.downloadScala(version, listener);
+                            Downloader.downloadFrege(version, listener);
                             return (Void) null;
                         }
                 );
             } catch (Exception e) {
+                log.error("Frege SDK download error", e);
                 Messages.showErrorDialog(contentPane, e.getMessage(), "Error Downloading Frege " + version);
                 return;
             }
@@ -143,7 +154,7 @@ public class SdkSelectionDialog extends JDialog {
     }
 
     private void onBrowse() {
-        Optional<FregeSdkDescriptor> result = SdkSelection.chooseScalaSdkFiles(myTable);
+        Optional<FregeSdkDescriptor> result = SdkSelection.chooseFregeSdkFiles(myTable);
 
         if (result.isPresent()) {
             mySelectedSdk = result.get();
@@ -152,7 +163,9 @@ public class SdkSelectionDialog extends JDialog {
     }
 
     private void onOK() {
-        mySelectedSdk = myTableModel.getItems().get(myTable.getSelectedRow()).getSdk();
+        if (myTable.getSelectedRowCount() > 0) {
+            mySelectedSdk = myTableModel.getItems().get(myTable.getSelectedRow()).getSdk();
+        }
         dispose();
     }
 
@@ -160,7 +173,6 @@ public class SdkSelectionDialog extends JDialog {
         mySelectedSdk = null;
         dispose();
     }
-
 
     public FregeSdkDescriptor open() {
         pack();

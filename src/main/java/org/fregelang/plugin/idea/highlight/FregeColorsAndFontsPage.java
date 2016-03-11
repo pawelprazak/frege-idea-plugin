@@ -43,7 +43,7 @@ public class FregeColorsAndFontsPage implements ColorSettingsPage {
     @Nullable
     @Override
     public Icon getIcon() {
-        return FregeIcons.FREGE;
+        return FregeIcons.DEFAULT;
     }
 
     @NotNull

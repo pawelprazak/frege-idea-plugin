@@ -1,6 +1,8 @@
 package org.fregelang.plugin.idea.framework;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.util.net.HttpConfigurable;
 
 import java.io.BufferedReader;
@@ -10,15 +12,19 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Versions {
 
-    private static final Pattern RELEASE_VERSION_LINE = Pattern.compile(".+>(\\d+\\.\\d+\\.\\d+)/<.*");
+    @VisibleForTesting
+    static final Pattern RELEASE_VERSION = Pattern.compile(".+>(?<full>(?<version>\\d+\\.\\d+\\.\\d+)-(?<revision>.*))/<.*");
+    private static final String GROUP_FULL = "full";
+    private static final String GROUP_VERSION = "version";
+    private static final String GROUP_REVISION = "revision";
 
-
-    public static List<String> loadScalaVersions() {
+    public static List<String> loadFregeVersions() {
         try {
             return loadVersionsOf(FREGE);
         } catch (IOException e) {
@@ -27,20 +33,28 @@ public class Versions {
     }
 
     private static List<String> loadVersionsOf(Entity entity) throws IOException {
-        List<String> versions = loadVersionsFrom(entity.url);
+        List<String> versions = loadVersionsFrom(loadLinesFrom(entity.url));
         if (versions.isEmpty()) {
             return entity.hardcodedVersions;
         }
+        return sortVersions(entity.minVersion, versions);
+    }
+
+    @VisibleForTesting
+    static List<String> sortVersions(Version minVersion, List<String> versions) {
         return versions.stream()
                 .map(Version::new)
-                .filter(v -> v.greaterThanOrEqual(entity.minVersion))
+                .filter(v -> v.greaterThanOrEqual(minVersion))
                 .sorted(Comparator.reverseOrder())
                 .map(Version::getNumber)
                 .collect(Collectors.toList());
     }
 
-    private static List<String> loadVersionsFrom(String url) throws IOException {
-        return loadLinesFrom(url).stream().flatMap(RELEASE_VERSION_LINE::splitAsStream).collect(Collectors.toList());
+    @VisibleForTesting
+    static List<String> loadVersionsFrom(List<String> html) throws IOException {
+        return html.stream()
+                .flatMap(line -> collectGroup(RELEASE_VERSION, GROUP_FULL, line).stream())
+                .collect(Collectors.toList());
     }
 
     private static List<String> loadLinesFrom(String url) throws IOException {
@@ -62,8 +76,17 @@ public class Versions {
         return ImmutableList.copyOf(lines);
     }
 
-    private static class Entity {
+    private static List<String> collectGroup(Pattern pattern, String name, String value) {
+        ImmutableList.Builder<String> builder = ImmutableList.builder();
 
+        Matcher matcher = pattern.matcher(value);
+        while (matcher.find()) {
+            builder.add(matcher.group(name));
+        }
+        return builder.build();
+    }
+
+    private static class Entity {
         private final String url;
         private final Version minVersion;
         private final List<String> hardcodedVersions;
@@ -71,16 +94,11 @@ public class Versions {
         Entity(String url, Version minVersion, List<String> hardcodedVersions) {
             this.url = url;
             this.minVersion = minVersion;
-
             this.hardcodedVersions = hardcodedVersions;
-        }
-
-        String defaultVersion() {
-            return hardcodedVersions.get(hardcodedVersions.size() - 1);
         }
     }
 
     private static final Entity FREGE = new Entity(
-            "http://repo1.maven.org/maven2/org/frege-lang/frege/",
-            new Version("3.22.0"), ImmutableList.of("3.22.367-g2737683", "3.22.524-gcc99d7e", "3.23.288-gaa3af0c", "3.23.370-g898bc8c", "3.23.401-g7c45277", "3.23.422-ga05a487"));
+            "http://repo1.maven.org/maven2/org/frege-lang/frege/", new Version("3.22.0"),
+            ImmutableList.of("3.22.367", "3.22.524", "3.23.288", "3.23.370", "3.23.401", "3.23.422"));
 }

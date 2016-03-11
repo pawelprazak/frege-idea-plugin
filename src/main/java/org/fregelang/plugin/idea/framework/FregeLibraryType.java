@@ -12,14 +12,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 public class FregeLibraryType extends LibraryType<FregeLibraryProperties> {
 
-    public static final FregeLibraryType INSTANCE =
-            Optional.ofNullable((FregeLibraryType) LibraryType.findByKind(FregeLibraryKind.INSTANCE))
-                    .orElseThrow(() -> new NoSuchElementException("Scala library type not found"));
+    public static FregeLibraryType getInstance() {
+        return (FregeLibraryType) LibraryType.findByKind(FregeLibraryKind.INSTANCE);
+    }
 
     FregeLibraryType() {
         super(FregeLibraryKind.INSTANCE);
@@ -28,15 +26,13 @@ public class FregeLibraryType extends LibraryType<FregeLibraryProperties> {
     @Nullable
     @Override
     public Icon getIcon() {
-        // FIXME add an sdk icon
-        return FregeIcons.DEFAULT;
+        return FregeIcons.FREGE_SDK;
     }
 
     @Nullable
     @Override
     public Icon getIcon(@Nullable LibraryProperties properties) {
-        // FIXME add an sdk icon
-        return FregeIcons.DEFAULT;
+        return FregeIcons.FREGE_SDK;
     }
 
     @Nullable

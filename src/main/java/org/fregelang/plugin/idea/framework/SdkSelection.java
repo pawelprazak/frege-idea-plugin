@@ -17,7 +17,7 @@ import static java.util.stream.Collectors.toList;
 import static org.fregelang.plugin.idea.framework.Files.allFiles;
 
 public class SdkSelection {
-    public static Optional<FregeSdkDescriptor> chooseScalaSdkFiles(TableView<SdkChoice> parentComponent) {
+    public static Optional<FregeSdkDescriptor> chooseFregeSdkFiles(TableView<SdkChoice> parentComponent) {
         try {
             return browse(parentComponent);
         } catch (Exception e) {

@@ -7,14 +7,15 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toMap;
 
 public enum FregeLanguageLevelProxy {
 
-    Frege_3_23(FregeLanguageLevelProxy.Frege_3_23.class),
-    Frege_3_22(FregeLanguageLevelProxy.Frege_3_22.class),
-    Frege_3_21(FregeLanguageLevelProxy.Frege_3_21.class),
-    Frege_3_20(FregeLanguageLevelProxy.Frege_3_20.class);
+    Frege_3_23(FregeLanguageLevel.Frege_3_23.class),
+    Frege_3_22(FregeLanguageLevel.Frege_3_22.class),
+    Frege_3_21(FregeLanguageLevel.Frege_3_21.class),
+    Frege_3_20(FregeLanguageLevel.Frege_3_20.class);
 
     private static final ImmutableBiMap<FregeLanguageLevelProxy, Class<? extends FregeLanguageLevel>> levels = ImmutableBiMap.copyOf(
             Arrays.asList(values()).stream().collect(toMap(Function.identity(), FregeLanguageLevelProxy::getType))
@@ -24,9 +25,10 @@ public enum FregeLanguageLevelProxy {
     private final FregeLanguageLevel instance;
 
     FregeLanguageLevelProxy(Class<? extends FregeLanguageLevel> type) {
-        this.type = type;
+        this.type = requireNonNull(type);
         try {
             this.instance = type.newInstance();
+            requireNonNull(this.instance);
         } catch (InstantiationException | IllegalAccessException e) {
             throw new IllegalArgumentException(e);
         }
@@ -44,8 +46,8 @@ public enum FregeLanguageLevelProxy {
         return levels.inverse().get(level.getClass());
     }
 
-    static FregeLanguageLevel proxyToLevel(FregeLanguageLevelProxy level) {
-        return level.getInstance();
+    static FregeLanguageLevel proxyToLevel(FregeLanguageLevelProxy proxy) {
+        return proxy.getInstance();
     }
 
     public static Optional<FregeLanguageLevel> findFirst(Predicate<FregeLanguageLevel> matcher) {
@@ -53,35 +55,5 @@ public enum FregeLanguageLevelProxy {
                 .map(FregeLanguageLevelProxy::proxyToLevel)
                 .filter(matcher)
                 .findFirst();
-    }
-
-    public static FregeLanguageLevel[] findAll() {
-        return Arrays.asList(values()).stream()
-                .map(FregeLanguageLevelProxy::getInstance)
-                .toArray(FregeLanguageLevel[]::new);
-    }
-
-    public static class Frege_3_20 extends FregeLanguageLevel {
-        public Frege_3_20() {
-            super(0, "3.20");
-        }
-    }
-
-    public static class Frege_3_21 extends FregeLanguageLevel {
-        public Frege_3_21() {
-            super(1, "3.21");
-        }
-    }
-
-    public static class Frege_3_22 extends FregeLanguageLevel {
-        public Frege_3_22() {
-            super(2, "3.22");
-        }
-    }
-
-    public static class Frege_3_23 extends FregeLanguageLevel {
-        public Frege_3_23() {
-            super(3, "3.23");
-        }
     }
 }

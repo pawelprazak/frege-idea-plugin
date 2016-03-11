@@ -49,7 +49,7 @@ public class FregeModuleBuilder extends JavaModuleBuilder {
 
     @Override
     public String getPresentableName() {
-        return "Frege";
+        return "Frege Module";
     }
 
     @Override

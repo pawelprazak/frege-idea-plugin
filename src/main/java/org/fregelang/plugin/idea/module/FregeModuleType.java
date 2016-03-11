@@ -30,12 +30,12 @@ public class FregeModuleType extends ModuleType<FregeModuleBuilder> {
     @NotNull
     @Override
     public String getDescription() {
-        return "Frege Module";
+        return "Add support for Frege";
     }
 
     @Override
     public Icon getBigIcon() {
-        return FregeIcons.DEFAULT;
+        return FregeIcons.FREGE_BIG;
     }
 
     @Override

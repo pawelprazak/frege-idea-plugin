@@ -135,7 +135,7 @@ public class Component {
 
         private Optional<Version> internalVersionOf(File file) {
             return resource
-                    .flatMap(r -> Artifact.readProperty(file, r, "version.number"))
+                    .flatMap(r -> Artifact.readProperty(file, r, "Bundle-Version"))
                     .map(Version::new);
         }
 
@@ -161,11 +161,33 @@ public class Component {
             return Optional.of(properties.getProperty(name));
         }
 
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Artifact artifact = (Artifact) o;
+            return Objects.equals(prefix, artifact.prefix) &&
+                    Objects.equals(resource, artifact.resource);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(prefix, resource);
+        }
+
+        @Override
+        public String toString() {
+            return com.google.common.base.Objects.toStringHelper(this)
+                    .add("prefix", prefix)
+                    .add("resource", resource)
+                    .toString();
+        }
+
         public static class FregeLibrary extends Artifact {
             public static final FregeLibrary INSTANCE = new FregeLibrary();
 
             public FregeLibrary() {
-                super("frege-library", Optional.of("library.properties"));
+                super("frege", Optional.of("META-INF/MANIFEST.MF"));
             }
         }
 
@@ -173,12 +195,12 @@ public class Component {
             public static final FregeCompiler INSTANCE = new FregeCompiler();
 
             private FregeCompiler() {
-                super("frege-compiler", Optional.of("compiler.properties"));
+                super("frege-compiler", Optional.of("META-INF/MANIFEST.MF"));
             }
         }
     }
 
-    public static class Kind {
+    public static abstract class Kind {
 
         public static final ImmutableSet<Kind> VALUES = ImmutableSet.of(new Binaries(), new Sources(), new Docs());
 
@@ -190,6 +212,26 @@ public class Component {
 
         public Pattern patternFor(String prefix) {
             return Pattern.compile(prefix + regex);
+        }
+
+        @Override
+        public final boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Kind kind = (Kind) o;
+            return Objects.equals(regex, kind.regex);
+        }
+
+        @Override
+        public final int hashCode() {
+            return Objects.hash(regex);
+        }
+
+        @Override
+        public String toString() {
+            return com.google.common.base.Objects.toStringHelper(this)
+                    .add("regex", regex)
+                    .toString();
         }
 
         public static class Binaries extends Kind {

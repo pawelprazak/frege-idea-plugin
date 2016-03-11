@@ -34,229 +34,228 @@ import java.util.Collection;
  * @author rahulsom
  */
 public class FregeCommandLineState extends CommandLineState {
-  private FregeRunConfiguration runConfiguration;
+    private FregeRunConfiguration runConfiguration;
 
-  public FregeCommandLineState(FregeRunConfiguration runConfiguration, ExecutionEnvironment executionEnvironment) {
-    super(executionEnvironment);
-    this.runConfiguration = runConfiguration;
-  }
-
-  @NotNull
-  @Override
-  protected ProcessHandler startProcess() throws ExecutionException {
-    System.out.println("StartProcess");
-
-    final Project project = runConfiguration.getProject();
-    final ProjectRootManager projectRootManager = ProjectRootManager.getInstance(project);
-
-    final VirtualFile[] sourceRoots = projectRootManager.getContentSourceRoots();
-    final String sourcePath = getSourcePath(sourceRoots);
-    final String fregeClassPath = getClassPathSource();
-    if (fregeClassPath == null) {
-      return echo("Could not find frege in classpath");
+    public FregeCommandLineState(FregeRunConfiguration runConfiguration, ExecutionEnvironment executionEnvironment) {
+        super(executionEnvironment);
+        this.runConfiguration = runConfiguration;
     }
-    final String projectOutPath = project.getBasePath() + "/out";
-    final String effectiveClassPath = fregeClassPath + ":" + projectOutPath;
 
-    /*
-     * Cross compile from frege to java
-     */
-    ProcessHandler fregec = compile(sourcePath, ".fr", "Could not compile with fregec",
-            file -> fregeCompile(sourcePath, projectOutPath, file));
-    if (fregec != null) return fregec;
-
-    /*
-     * Compile Java to bytecode
-     */
-    ProcessHandler javac = compile(projectOutPath, ".java", "Could not compile with javac", file ->
-            com.sun.tools.javac.Main.compile(new String[]{"-cp", effectiveClassPath, "-d", projectOutPath, file}) == 0
-    );
-    if (javac != null) return javac;
-
-    /*
-     * Execute bytecode
-     */
-    final KillableColoredProcessHandler processHandler = new KillableColoredProcessHandler(new GeneralCommandLine(
-        "java",
-        "-cp", effectiveClassPath,
-        runConfiguration.getClassName()
-    ));
-    processHandler.setShouldDestroyProcessRecursively(true);
-    return processHandler;
-  }
-
-  @NotNull
-  private Boolean fregeCompile(String sourcePath, String projectOutPath, String file) {
-
-    try {
-      Method runCompiler = getRunCompiler();
-      if (runCompiler == null) {
-        return false;
-      }
-
-      String[] compilerArgs = {"-d", projectOutPath, "-sp", sourcePath, "-nocp", "-greek", "-j", file};
-      return (Boolean) runCompiler.invoke(null, new Object[]{compilerArgs});
-    } catch (Exception e) {
-      e.printStackTrace();
-      return false;
-    }
-  }
-
-  String _lastJarPath;
-  Method _lastRunCompilerMethod;
-  synchronized Method getCachedRunCompiler() throws MalformedURLException, ClassNotFoundException {
-    if (_lastRunCompilerMethod != null && this.getClassPathSource().equals(_lastJarPath)) {
-      return _lastRunCompilerMethod;
-    } else {
-      _lastRunCompilerMethod = getRunCompiler();
-      _lastJarPath = this.getClassPathSource();
-      return _lastRunCompilerMethod;
-    }
-  }
-
-  @Nullable
-  private Method getRunCompiler() throws MalformedURLException, ClassNotFoundException {
-    URL[] urls = new URL[]{ new File(this.getClassPathSource()).toURI().toURL() };
-    URLClassLoader classLoader = new URLClassLoader(urls, ClassLoader.getSystemClassLoader());
-    Class<?> fregeMain = Class.forName("frege.compiler.Main", true, classLoader);
-    Method runCompiler = null;
-    for (Method method : fregeMain.getMethods()) {
-      if (method.getName().equals("runCompiler")) {
-        runCompiler = method;
-      }
-    }
-    return runCompiler;
-  }
-
-  @Nullable
-  private ProcessHandler compile(
-          String projectOutPath, String suffix, String failureMessage, CommandFunction commandFunction)
-          throws ExecutionException {
-    final ArrayList<String> fileNames = new ArrayList<>();
-    File outFile = new File(projectOutPath);
-    if (!outFile.exists()) {
-      outFile.mkdirs();
-    }
-    final File[] fileList = outFile.listFiles();
-    if (fileList == null || fileList.length == 0) {
-      return echo("Filelist could not be compiled");
-    }
-    for (File file : fileList) {
-      if (file.getAbsolutePath().endsWith(suffix))
-        fileNames.add(file.getAbsolutePath());
-    }
-    for (String file : fileNames) {
-      final Boolean status = commandFunction.apply(file);
-      if (!status) {
-        return echo(failureMessage);
-      }
-    }
-    return null;
-  }
-
-  @NotNull
-  private KillableColoredProcessHandler echo(String message) throws ExecutionException {
-    return new KillableColoredProcessHandler(new GeneralCommandLine(
-        "echo",
-        message
-    ));
-  }
-
-  public void pipe(InputStream is, OutputStream os) throws IOException {
-    int n;
-    byte[] buffer = new byte[1024];
-    while ((n = is.read(buffer)) > -1) {
-      os.write(buffer, 0, n);   // Don't allow any extra bytes to creep in, final write
-    }
-  }
-
-  private int execProcess(String[] command) {
-    try {
-      final Process process = new ProcessBuilder(command).start();
-      process.waitFor();
-      pipe(process.getErrorStream(), System.err);
-      pipe(process.getInputStream(), System.out);
-      return process.exitValue();
-    } catch (IOException e) {
-      e.printStackTrace();
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
-    return -1;
-  }
-
-  @NotNull
-  private String getSourcePath(VirtualFile[] sourceRoots) {
-    String sourcePath = "";
-    for (VirtualFile sourceRoot : sourceRoots) {
-      if (sourcePath.length() > 0) {
-        sourcePath += ":";
-      }
-      sourcePath += sourceRoot.getPath();
-    }
-    return sourcePath;
-  }
-
-  /**
-   * Gets the classpath of the frege compiler
-   *
-   * @return classpath of the frege compiler
-   */
-  private String getClassPathSource() {
-    final Project project = runConfiguration.getProject();
-    final FileBasedIndex fileBasedIndex = FileBasedIndex.getInstance();
-    final Collection<VirtualFile> containingFiles = fileBasedIndex.getContainingFiles(
-        FileTypeIndex.NAME, JavaClassFileType.INSTANCE, GlobalSearchScope.allScope(project));
-    final ProjectFileIndex fileIndex = ProjectRootManager.getInstance(project).getFileIndex();
-
-    return getFregeJarPath(containingFiles, fileIndex);
-  }
-
-  /**
-   * Given a collection of virtual files, and a project index, find the library that contains the frege compiler.
-   *
-   * @param containingFiles
-   * @param fileIndex
-   * @return path of the frege compiler jar
-   */
-  @Nullable
-  private String getFregeJarPath(Collection<VirtualFile> containingFiles, ProjectFileIndex fileIndex) {
-    for (VirtualFile containingFile : containingFiles) {
-      if (containingFile.getPath().endsWith("frege/compiler/Main.class")) {
-        for (OrderEntry orderEntry : fileIndex.getOrderEntriesForFile(containingFile)) {
-          String file = getPathFromOrderEntry(orderEntry);
-          if (file != null) return file;
-        }
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Given an orderEntry, checks if it represents a library, and if it does, returns the location of the jar
-   *
-   * @param orderEntry
-   * @return path of the jar represented by the orderEntry
-   */
-  @Nullable
-  private String getPathFromOrderEntry(OrderEntry orderEntry) {
-    if (orderEntry instanceof LibraryOrderEntry) {
-      final LibraryOrderEntry libraryOrderEntry = (LibraryOrderEntry) orderEntry;
-      final Library library = libraryOrderEntry.getLibrary();
-      if (library == null) {
-        return null;
-      }
-      final VirtualFile[] files = library.getFiles(OrderRootType.CLASSES);
-      if (files.length == 1) {
-        VirtualFile file = files[0];
-        return file.getPath().replaceAll("!/$", "");
-      }
-    }
-    return null;
-  }
-
-  interface CommandFunction {
     @NotNull
-    Boolean apply(@NotNull String file);
-  }
+    @Override
+    protected ProcessHandler startProcess() throws ExecutionException {
+        final Project project = runConfiguration.getProject();
+        final ProjectRootManager projectRootManager = ProjectRootManager.getInstance(project);
+
+        final VirtualFile[] sourceRoots = projectRootManager.getContentSourceRoots();
+        final String sourcePath = getSourcePath(sourceRoots);
+        final String fregeClassPath = getClassPathSource();
+        if (fregeClassPath == null) {
+            return echo("Could not find frege in classpath");
+        }
+        final String projectOutPath = project.getBasePath() + "/out";
+        final String effectiveClassPath = fregeClassPath + ":" + projectOutPath;
+
+        /*
+         * Cross compile from frege to java
+         */
+        ProcessHandler fregec = compile(sourcePath, ".fr", "Could not compile with fregec",
+                file -> fregeCompile(sourcePath, projectOutPath, file));
+        if (fregec != null) return fregec;
+
+        /*
+         * Compile Java to bytecode
+         */
+        ProcessHandler javac = compile(projectOutPath, ".java", "Could not compile with javac", file ->
+                com.sun.tools.javac.Main.compile(new String[]{"-cp", effectiveClassPath, "-d", projectOutPath, file}) == 0
+        );
+        if (javac != null) return javac;
+
+        /*
+         * Execute bytecode
+         */
+        final KillableColoredProcessHandler processHandler = new KillableColoredProcessHandler(new GeneralCommandLine(
+                "java",
+                "-cp", effectiveClassPath,
+                runConfiguration.getClassName()
+        ));
+        processHandler.setShouldDestroyProcessRecursively(true);
+        return processHandler;
+    }
+
+    @NotNull
+    private Boolean fregeCompile(String sourcePath, String projectOutPath, String file) {
+
+        try {
+            Method runCompiler = getRunCompiler();
+            if (runCompiler == null) {
+                return false;
+            }
+
+            String[] compilerArgs = {"-d", projectOutPath, "-sp", sourcePath, "-nocp", "-greek", "-j", file};
+            return (Boolean) runCompiler.invoke(null, new Object[]{compilerArgs});
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    String _lastJarPath;
+    Method _lastRunCompilerMethod;
+
+    synchronized Method getCachedRunCompiler() throws MalformedURLException, ClassNotFoundException {
+        if (_lastRunCompilerMethod != null && this.getClassPathSource().equals(_lastJarPath)) {
+            return _lastRunCompilerMethod;
+        } else {
+            _lastRunCompilerMethod = getRunCompiler();
+            _lastJarPath = this.getClassPathSource();
+            return _lastRunCompilerMethod;
+        }
+    }
+
+    @Nullable
+    private Method getRunCompiler() throws MalformedURLException, ClassNotFoundException {
+        URL[] urls = new URL[]{new File(this.getClassPathSource()).toURI().toURL()};
+        URLClassLoader classLoader = new URLClassLoader(urls, ClassLoader.getSystemClassLoader());
+        Class<?> fregeMain = Class.forName("frege.compiler.Main", true, classLoader);
+        Method runCompiler = null;
+        for (Method method : fregeMain.getMethods()) {
+            if (method.getName().equals("runCompiler")) {
+                runCompiler = method;
+            }
+        }
+        return runCompiler;
+    }
+
+    @Nullable
+    private ProcessHandler compile(
+            String projectOutPath, String suffix, String failureMessage, CommandFunction commandFunction)
+            throws ExecutionException {
+        final ArrayList<String> fileNames = new ArrayList<>();
+        File outFile = new File(projectOutPath);
+        if (!outFile.exists()) {
+            outFile.mkdirs();
+        }
+        final File[] fileList = outFile.listFiles();
+        if (fileList == null || fileList.length == 0) {
+            return echo("Filelist could not be compiled");
+        }
+        for (File file : fileList) {
+            if (file.getAbsolutePath().endsWith(suffix))
+                fileNames.add(file.getAbsolutePath());
+        }
+        for (String file : fileNames) {
+            final Boolean status = commandFunction.apply(file);
+            if (!status) {
+                return echo(failureMessage);
+            }
+        }
+        return null;
+    }
+
+    @NotNull
+    private KillableColoredProcessHandler echo(String message) throws ExecutionException {
+        return new KillableColoredProcessHandler(new GeneralCommandLine(
+                "echo",
+                message
+        ));
+    }
+
+    public void pipe(InputStream is, OutputStream os) throws IOException {
+        int n;
+        byte[] buffer = new byte[1024];
+        while ((n = is.read(buffer)) > -1) {
+            os.write(buffer, 0, n);   // Don't allow any extra bytes to creep in, final write
+        }
+    }
+
+    private int execProcess(String[] command) {
+        try {
+            final Process process = new ProcessBuilder(command).start();
+            process.waitFor();
+            pipe(process.getErrorStream(), System.err);
+            pipe(process.getInputStream(), System.out);
+            return process.exitValue();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    @NotNull
+    private String getSourcePath(VirtualFile[] sourceRoots) {
+        String sourcePath = "";
+        for (VirtualFile sourceRoot : sourceRoots) {
+            if (sourcePath.length() > 0) {
+                sourcePath += ":";
+            }
+            sourcePath += sourceRoot.getPath();
+        }
+        return sourcePath;
+    }
+
+    /**
+     * Gets the classpath of the frege compiler
+     *
+     * @return classpath of the frege compiler
+     */
+    private String getClassPathSource() {
+        final Project project = runConfiguration.getProject();
+        final FileBasedIndex fileBasedIndex = FileBasedIndex.getInstance();
+        final Collection<VirtualFile> containingFiles = fileBasedIndex.getContainingFiles(
+                FileTypeIndex.NAME, JavaClassFileType.INSTANCE, GlobalSearchScope.allScope(project));
+        final ProjectFileIndex fileIndex = ProjectRootManager.getInstance(project).getFileIndex();
+
+        return getFregeJarPath(containingFiles, fileIndex);
+    }
+
+    /**
+     * Given a collection of virtual files, and a project index, find the library that contains the frege compiler.
+     *
+     * @param containingFiles
+     * @param fileIndex
+     * @return path of the frege compiler jar
+     */
+    @Nullable
+    private String getFregeJarPath(Collection<VirtualFile> containingFiles, ProjectFileIndex fileIndex) {
+        for (VirtualFile containingFile : containingFiles) {
+            if (containingFile.getPath().endsWith("frege/compiler/Main.class")) {
+                for (OrderEntry orderEntry : fileIndex.getOrderEntriesForFile(containingFile)) {
+                    String file = getPathFromOrderEntry(orderEntry);
+                    if (file != null) return file;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Given an orderEntry, checks if it represents a library, and if it does, returns the location of the jar
+     *
+     * @param orderEntry
+     * @return path of the jar represented by the orderEntry
+     */
+    @Nullable
+    private String getPathFromOrderEntry(OrderEntry orderEntry) {
+        if (orderEntry instanceof LibraryOrderEntry) {
+            final LibraryOrderEntry libraryOrderEntry = (LibraryOrderEntry) orderEntry;
+            final Library library = libraryOrderEntry.getLibrary();
+            if (library == null) {
+                return null;
+            }
+            final VirtualFile[] files = library.getFiles(OrderRootType.CLASSES);
+            if (files.length == 1) {
+                VirtualFile file = files[0];
+                return file.getPath().replaceAll("!/$", "");
+            }
+        }
+        return null;
+    }
+
+    interface CommandFunction {
+        @NotNull
+        Boolean apply(@NotNull String file);
+    }
 }

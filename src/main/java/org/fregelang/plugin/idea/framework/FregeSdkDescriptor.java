@@ -63,9 +63,9 @@ public class FregeSdkDescriptor {
         properties.setLanguageLevel(version.flatMap(FregeLanguageLevel::from).orElse(FregeLanguageLevel.DEFAULT));
         properties.setCompilerClasspath(compilerFiles);
 
-        String name = "scala-sdk-" + version.map(Version::getNumber).orElse("Unknown");
+        String name = "frege-sdk-" + version.map(Version::getNumber).orElse("Unknown");
 
-        return new NewLibraryConfiguration(name, FregeLibraryType.INSTANCE, properties) {
+        return new NewLibraryConfiguration(name, FregeLibraryType.getInstance(), properties) {
             @Override
             public void addRoots(@NotNull LibraryEditor editor) {
                 libraryFiles.stream().map(toLibraryRootURL).forEach(r -> editor.addRoot(r, OrderRootType.CLASSES));
@@ -92,6 +92,11 @@ public class FregeSdkDescriptor {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hash(version, compilerFiles, libraryFiles, sourceFiles, docFiles);
+    }
+
+    @Override
     public String toString() {
         return com.google.common.base.Objects.toStringHelper(this)
                 .add("compilerFiles", compilerFiles)
@@ -100,11 +105,6 @@ public class FregeSdkDescriptor {
                 .add("sourceFiles", sourceFiles)
                 .add("docFiles", docFiles)
                 .toString();
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(version, compilerFiles, libraryFiles, sourceFiles, docFiles);
     }
 
     public static FregeSdkDescriptor from(List<Component> components) {
@@ -116,7 +116,7 @@ public class FregeSdkDescriptor {
         List<Component> docComponents = componentsByKind.getOrDefault(Component.Kind.Docs.INSTANCE, new ArrayList<>());
 
         Set<Component.Artifact> requiredBinaryArtifacts = ImmutableSet.of(
-                Component.Artifact.FregeLibrary.INSTANCE, Component.Artifact.FregeCompiler.INSTANCE);
+                Component.Artifact.FregeLibrary.INSTANCE/*, Component.Artifact.FregeCompiler.INSTANCE*/);
 
         Set<Component.Artifact> existingBinaryArtifacts = binaryComponents.stream()
                 .map(Component::getArtifact)
@@ -128,9 +128,8 @@ public class FregeSdkDescriptor {
         if (missingBinaryArtifacts.isEmpty()) {
             Stream<Component> compilerBinaries = binaryComponents.stream()
                     .filter(it -> requiredBinaryArtifacts.contains(it.getArtifact()));
-
             List<Component.Artifact> libraryArtifacts = Component.Artifact.VALUES.stream()
-                    .filter(v -> v == Component.Artifact.FregeCompiler.INSTANCE)
+                    .filter(v -> v != Component.Artifact.FregeCompiler.INSTANCE)
                     .collect(toList());
 
             Stream<Component> libraryBinaries = binaryComponents.stream().filter(it -> libraryArtifacts.contains(it.getArtifact()));
@@ -139,7 +138,7 @@ public class FregeSdkDescriptor {
                     .filter(it -> libraryArtifacts.contains(it.getArtifact()));
 
             Optional<Version> libraryVersion = binaryComponents.stream()
-                    .filter(c -> c.getArtifact() == Component.Artifact.FregeLibrary.INSTANCE)
+                    .filter(c -> c.getArtifact().equals(Component.Artifact.FregeLibrary.INSTANCE))
                     .map(Component::getVersion)
                     .filter(Optional::isPresent)
                     .map(Optional::get)
@@ -157,5 +156,22 @@ public class FregeSdkDescriptor {
                     .map(Component.Artifact::getTitle)
                     .reduce((a, b) -> a + ", " + b));
         }
+    }
+
+    public static Comparator<? super FregeSdkDescriptor> comparator() {
+        return (o1, o2) -> {
+            Optional<Version> ov1 = o1.getVersion();
+            Optional<Version> ov2 = o2.getVersion();
+            if (ov1.isPresent() && ov2.isPresent()) {
+                return ov1.get().compareTo(ov2.get());
+            } else if (!ov1.isPresent() && ov2.isPresent()) {
+                return -1;
+            } else if (ov1.isPresent() && !ov2.isPresent()) {
+                return 1;
+            } else if (!ov1.isPresent() && !ov2.isPresent()) {
+                return 0;
+            }
+            return 0; // should not happen
+        };
     }
 }
