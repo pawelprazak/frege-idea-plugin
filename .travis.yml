@@ -14,7 +14,9 @@ jdk:
 env:
   - IDEA_VERSION=LATEST-EAP-SNAPSHOT
   - IDEA_VERSION=IC-15.0.4
-  global:
+
+#env:
+#  global:
   # JetBrains plugin release credentials
   #- secure: ...
   #- secure: ...
